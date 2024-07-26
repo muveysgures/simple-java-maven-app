@@ -1,8 +1,26 @@
 pipeline {
     agent {
         kubernetes {
-            image 'maven:3.8.1-adoptopenjdk-11'
-            args '-v /root/.m2:/root/.m2'
+            yaml '''
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    some-label: some-value
+spec:
+  containers:
+  - name: build
+    image: maven:3.8.1-adoptopenjdk-11
+    volumeMounts:
+    - name: m2-repo
+      mountPath: /root/.m2
+    command:
+    - cat
+    tty: true
+  volumes:
+  - name: m2-repo
+    emptyDir: {}
+'''
         }
     }
     options {
